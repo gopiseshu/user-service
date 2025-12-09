@@ -1,6 +1,6 @@
 /* groovylint-disable-next-line CompileStatic */
 pipeline {
-    aganet any
+    agent any
     tools {
         maven 'myMaven'
     }
