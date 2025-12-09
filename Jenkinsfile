@@ -9,11 +9,12 @@ pipeline {
         IMAGE_TAG = '2'
     }
     stages{
-        stage('checkout'){
-            steps{
-                git 'https://github.com/gopiseshu/user-service.git'
+       stage('Checkout') {
+            steps {
+                checkout scm
+               
             }
-        }
+       }
         stage('Build Maven'){
             steps{
                 sh 'mvn clean package -DskipTests'
