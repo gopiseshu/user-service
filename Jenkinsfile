@@ -2,7 +2,7 @@
 pipeline {
     aganet any
     tools {
-        maven 'muMaven'
+        maven 'myMaven'
     }
     environment {
         IMAGE_NAME = 'gopikrishna1338/user-image'
