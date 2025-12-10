@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB = credentials('dockerhub-creds')
         EC2_HOST = '13.126.106.239'
         EC2_USER = "ec2-user"
         IMAGE = 'gopikrishna1338/user-service:latest'
