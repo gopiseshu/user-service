@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools{
+        Maven 'myMaven'
+    }
 
     environment {
         EC2_HOST = '13.126.106.239'
