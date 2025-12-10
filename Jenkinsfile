@@ -7,7 +7,7 @@ pipeline {
     environment {
         EC2_HOST = '13.126.106.239'
         EC2_USER = "ec2-user"
-        IMAGE = 'gopikrishna1338/user-service:latest'
+        IMAGE = 'gopikrishna1338/user-service:2'
     }
 
     stages {
@@ -26,7 +26,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build --platform linux/amd64 -t ${IMAGE} ."
+                sh "docker build  -t ${IMAGE} ."
             }
         }
 
