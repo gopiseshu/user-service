@@ -27,14 +27,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                  unset DOCKER_HOST
-                  docker info
-                '''
-                sh '''
-                    
-                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                '''
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                
             }
         }
 
