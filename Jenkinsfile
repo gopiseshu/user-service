@@ -40,18 +40,21 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
-    steps {
-                sshagent(['sshid']) {
-                    bat """
-            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "docker pull ${IMAGE}"
-            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "docker stop user-service || true"
-            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "docker rm user-service || true"
-            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "docker run -d --name user-service -p 8080:8080 ${IMAGE}"
-            """
-                }
-          }
+       stage('Deploy to EC2') {
+         steps {
+             sshagent(['ec2-ssh']) {
+                sh """
+                  ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
+                  docker pull ${IMAGE} &&
+                  docker stop user-service || true &&
+                  docker rm user-service || true &&
+                  docker run -d --name user-service -p 8080:8080 ${IMAGE}
+                  '
+                """
+               }
+            }
         }
+
 
     }
 }
