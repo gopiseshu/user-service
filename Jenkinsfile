@@ -27,13 +27,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                 sh '''
-                     docker run --privileged --rm \
-                     -v $PWD:/workspace \
-                     -w /workspace \
-                      docker:27-dind \
-                      docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                    '''
+
+                sh " docker build -t ${IMAGE_NAME}:${IMAGE_TAG} . "
+                    
              }
         }
 
