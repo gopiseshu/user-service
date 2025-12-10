@@ -1,21 +1,19 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'myMaven'
-        
-    }
-
     environment {
-        IMAGE_NAME = 'gopikrishna1338/user-image'
-        IMAGE_TAG  = '2'
-        
+        DOCKERHUB = credentials('dockerhub-creds')
+        EC2_HOST = '13.126.106.239'
+        EC2_USER = "ec2-user"
+        /* groovylint-disable-next-line UnnecessaryGString */
+        IMAGE = 'gopikrishna1338/user-service:latest'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/gopiseshu/user-service.git'
             }
         }
 
@@ -27,31 +25,33 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-
-                sh " docker build -t ${IMAGE_NAME}:${IMAGE_TAG} . "
-                    
-             }
-        }
-
-        stage('Push Image') {
-            steps {
-                script {
-                    docker.withRegistry('', 'dockerid') {
-                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    }
-                }
+                sh "docker build -t ${IMAGE} ."
             }
         }
 
-        stage('Deploy Image to Kubernetes') {
+        stage('Push Docker Image') {
             steps {
-                withKubeConfig(credentialsId: 'kubeconfig') {
+               script {
+            docker.withRegistry('', 'dockerid') {
+                sh "docker push ${IMAGE}"
+            }
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(['ec2-ssh']) {
                     sh """
-                        kubectl set image deployment/user-service-deployment \
-                        user-service=${IMAGE_NAME}:${IMAGE_TAG} --record
+                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
+                        docker pull ${IMAGE} &&
+                        docker stop user-service || true &&
+                        docker rm user-service || true &&
+                        docker run -d --name user-service -p 8080:8080 ${IMAGE}
+                    '
                     """
                 }
             }
         }
+
     }
 }
