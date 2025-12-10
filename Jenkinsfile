@@ -3,12 +3,13 @@ pipeline {
 
     tools {
         maven 'myMaven'
+        docker 'myDocker'
     }
 
     environment {
         IMAGE_NAME = 'gopikrishna1338/user-image'
         IMAGE_TAG  = '2'
-        DOCKER_HOST = "unix:///var/run/docker.sock"
+        
     }
 
     stages {
