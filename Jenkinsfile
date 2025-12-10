@@ -4,7 +4,6 @@ pipeline {
 
     tools {
         maven 'myMaven'
-       
     }
 
     environment {
@@ -27,16 +26,32 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:24' 
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                withEnv(["DOCKER_HOST=unix:///var/run/docker.sock"]) {
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                }
             }
         }
 
         stage('Push Image') {
+            agent {
+                docker {
+                    image 'docker:24'
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                script {
-                    docker.withRegistry('', 'dockerid') {
-                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                withEnv(["DOCKER_HOST=unix:///var/run/docker.sock"]) {
+                    script {
+                        docker.withRegistry('', 'dockerid') {
+                            sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        }
                     }
                 }
             }
@@ -46,7 +61,8 @@ pipeline {
             steps {
                 withKubeConfig(credentialsId: 'kubeconfig') {
                     sh """
-                        kubectl set image deployment/user-service-deployment user-service=${IMAGE_NAME}:${IMAGE_TAG} --record
+                        kubectl set image deployment/user-service-deployment \
+                        user-service=${IMAGE_NAME}:${IMAGE_TAG} --record
                     """
                 }
             }
