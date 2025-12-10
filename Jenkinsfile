@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools{
-        Maven 'myMaven'
+      maven 'myMaven'
     }
 
     environment {
