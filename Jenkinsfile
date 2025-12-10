@@ -5,7 +5,6 @@ pipeline {
         DOCKERHUB = credentials('dockerhub-creds')
         EC2_HOST = '13.126.106.239'
         EC2_USER = "ec2-user"
-        /* groovylint-disable-next-line UnnecessaryGString */
         IMAGE = 'gopikrishna1338/user-service:latest'
     }
 
@@ -31,10 +30,11 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-               script {
-            docker.withRegistry('', 'dockerid') {
-                sh "docker push ${IMAGE}"
-            }
+                script {
+                    docker.withRegistry('', 'dockerid') {
+                        sh "docker push ${IMAGE}"
+                    }
+                }
             }
         }
 
@@ -54,6 +54,4 @@ pipeline {
         }
 
     }
-  
- }
 }
